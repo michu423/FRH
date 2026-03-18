@@ -6,22 +6,23 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-// ekrany autoryzacji
+// Auth screens
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 
-// główne ekrany
+// Main screens
 import HomeScreen from './src/screens/Home/HomeScreen';
 import PlansScreen from './src/screens/Plans/PlansScreen';
-import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';  // NOWY
+import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';
 import ExercisesScreen from './src/screens/Exercises/ExercisesScreen';
+import ExerciseDetailScreen from './src/screens/Exercises/ExerciseDetailScreen';
 import ProgressScreen from './src/screens/Progress/ProgressScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// stack navigator dla ekranów planów treningowych
+// Stack Navigator dla planów (lista + szczegóły)
 function PlansStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -31,7 +32,17 @@ function PlansStack() {
   );
 }
 
-// Navigacja główna z zakładkami
+// Stack Navigator dla Exercises (lista + szczegóły)
+function ExercisesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ExercisesList" component={ExercisesScreen} />
+      <Stack.Screen name="ExerciseDetail" component={ExerciseDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Bottom Tabs Navigator (główna nawigacja)
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -65,12 +76,12 @@ function MainTabs() {
       />
       <Tab.Screen 
         name="PlansTab" 
-        component={PlansStack}  // ZMIENIONE z PlansScreen na PlansStack
+        component={PlansStack}
         options={{ tabBarLabel: 'Plany' }}
       />
       <Tab.Screen 
         name="ExercisesTab" 
-        component={ExercisesScreen} 
+        component={ExercisesStack}
         options={{ tabBarLabel: 'Ćwiczenia' }}
       />
       <Tab.Screen 
@@ -87,12 +98,18 @@ function MainTabs() {
   );
 }
 
+// App Content (logika zalogowany/niezalogowany)
 function AppContent() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+      <View style={{ 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: '#f8f9fa' 
+      }}>
         <ActivityIndicator size="large" color="#28a745" />
       </View>
     );
@@ -114,6 +131,7 @@ function AppContent() {
   );
 }
 
+// Root App component z AuthProviderem
 export default function App() {
   return (
     <AuthProvider>

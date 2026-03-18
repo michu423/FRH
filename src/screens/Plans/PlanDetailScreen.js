@@ -1,3 +1,4 @@
+// src/screens/Plans/PlanDetailScreen.js - PEŁNY (z wizualnym sukcesem)
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,30 +13,52 @@ export default function PlanDetailScreen() {
   const { plan } = route.params;
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleActivatePlan = async () => {
     setLoading(true);
     try {
-      // zapisz plan do bazy danych użytkownika firestore
+      // zapisz plan do Firestore
       await updateDoc(doc(db, 'users', user.uid), {
         activePlan: plan.id,
         activePlanName: plan.name,
       });
 
-      Alert.alert(
-        'Sukces!',
-        `Plan "${plan.name}" został aktywowany!`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
-    } catch (error) {
-      Alert.alert('Błąd', 'Nie udało się aktywować planu');
-    } finally {
       setLoading(false);
+      
+      // Pokaż sukces
+      setShowSuccess(true);
+      
+      // Automatyczny powrót po 2.5 sekundach
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2500);
+      
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Błąd', 'Nie udało się aktywować planu. Spróbuj ponownie.');
+      console.error(error);
     }
   };
 
   return (
     <View style={styles.container}>
+      {/* Success overlay */}
+      {showSuccess && (
+        <View style={styles.successOverlay}>
+          <View style={styles.successCard}>
+            <Ionicons name="checkmark-circle" size={80} color="#28a745" />
+            <Text style={styles.successTitle}>Sukces! 🎉</Text>
+            <Text style={styles.successText}>
+              Plan "{plan.name}" został aktywowany!
+            </Text>
+            <Text style={styles.successSubtext}>
+              Możesz go śledzić w zakładce Postępy
+            </Text>
+          </View>
+        </View>
+      )}
+
       {/* Header z przyciskiem wstecz */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -231,5 +254,49 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  // Style Success overlay
+  successOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  successCard: {
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 40,
+    alignItems: 'center',
+    maxWidth: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  successTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  successText: {
+    fontSize: 16,
+    color: '#2c3e50',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 10,
+    fontWeight: '600',
+  },
+  successSubtext: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    textAlign: 'center',
   },
 });
