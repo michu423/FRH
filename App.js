@@ -5,10 +5,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+
+// ekrany autoryzacji
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
+
+// główne ekrany
 import HomeScreen from './src/screens/Home/HomeScreen';
 import PlansScreen from './src/screens/Plans/PlansScreen';
+import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';  // NOWY
 import ExercisesScreen from './src/screens/Exercises/ExercisesScreen';
 import ProgressScreen from './src/screens/Progress/ProgressScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
@@ -16,7 +21,17 @@ import ProfileScreen from './src/screens/Profile/ProfileScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// navigator z bottom tabs
+// stack navigator dla ekranów planów treningowych
+function PlansStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="PlansList" component={PlansScreen} />
+      <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Navigacja główna z zakładkami
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -39,7 +54,7 @@ function MainTabs() {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#28a745',
-        tabBarInactiveTintColor: '#gray',
+        tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}
     >
@@ -50,7 +65,7 @@ function MainTabs() {
       />
       <Tab.Screen 
         name="PlansTab" 
-        component={PlansScreen} 
+        component={PlansStack}  // ZMIENIONE z PlansScreen na PlansStack
         options={{ tabBarLabel: 'Plany' }}
       />
       <Tab.Screen 
