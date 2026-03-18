@@ -19,11 +19,13 @@ import ExerciseDetailScreen from './src/screens/Exercises/ExerciseDetailScreen';
 import ProgressScreen from './src/screens/Progress/ProgressScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
 import CalorieCalculatorScreen from './src/screens/Profile/CalorieCalculatorScreen';
+import WorkoutScreen from './src/screens/Workout/WorkoutScreen';
+import WorkoutCompleteScreen from './src/screens/Workout/WorkoutCompleteScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Lista planów i szczegóły
+// Plans
 function PlansStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -33,7 +35,7 @@ function PlansStack() {
   );
 }
 
-// Ćwiczenia lista i szczegóły
+// Exercises
 function ExercisesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -43,7 +45,7 @@ function ExercisesStack() {
   );
 }
 
-// Kalkulator kalorii
+// Profile (kalkulator kalorii)
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -130,7 +132,11 @@ function AppContent() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen name="Main" component={MainTabs} />
+          <>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="Workout" component={WorkoutScreen} />
+            <Stack.Screen name="WorkoutComplete" component={WorkoutCompleteScreen} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
