@@ -6,11 +6,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-// Auth screens
+// Ekrany autoryzacji
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 
-// Main screens
+// Główne ekrany
 import HomeScreen from './src/screens/Home/HomeScreen';
 import PlansScreen from './src/screens/Plans/PlansScreen';
 import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';
@@ -18,11 +18,12 @@ import ExercisesScreen from './src/screens/Exercises/ExercisesScreen';
 import ExerciseDetailScreen from './src/screens/Exercises/ExerciseDetailScreen';
 import ProgressScreen from './src/screens/Progress/ProgressScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
+import CalorieCalculatorScreen from './src/screens/Profile/CalorieCalculatorScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Stack Navigator dla planów (lista + szczegóły)
+// Lista planów i szczegóły
 function PlansStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -32,7 +33,7 @@ function PlansStack() {
   );
 }
 
-// Stack Navigator dla Exercises (lista + szczegóły)
+// Ćwiczenia lista i szczegóły
 function ExercisesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -42,7 +43,17 @@ function ExercisesStack() {
   );
 }
 
-// Bottom Tabs Navigator (główna nawigacja)
+// Kalkulator kalorii
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen name="CalorieCalculator" component={CalorieCalculatorScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Główna nawigacja
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -91,14 +102,14 @@ function MainTabs() {
       />
       <Tab.Screen 
         name="ProfileTab" 
-        component={ProfileScreen} 
+        component={ProfileStack}
         options={{ tabBarLabel: 'Profil' }}
       />
     </Tab.Navigator>
   );
 }
 
-// App Content (logika zalogowany/niezalogowany)
+// Logika zalogowany/niezalogowany
 function AppContent() {
   const { user, loading } = useAuth();
 
@@ -131,7 +142,7 @@ function AppContent() {
   );
 }
 
-// Root App component z AuthProviderem
+// Root
 export default function App() {
   return (
     <AuthProvider>

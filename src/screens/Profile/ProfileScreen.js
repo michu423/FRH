@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const navigation = useNavigation();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -74,6 +76,15 @@ export default function ProfileScreen() {
           <Text style={styles.infoValue}>{user?.profile?.activePlan || 'Brak'}</Text>
         </View>
       </View>
+
+      {/* Przycisk kalkulatora */}
+      <TouchableOpacity 
+        style={styles.calculatorButton}
+        onPress={() => navigation.navigate('CalorieCalculator')}
+      >
+        <Ionicons name="calculator-outline" size={24} color="#28a745" />
+        <Text style={styles.calculatorText}>Kalkulator kalorii</Text>
+      </TouchableOpacity>
 
       {/* Przycisk edycji (placeholder) */}
       <TouchableOpacity style={styles.editButton}>
@@ -159,10 +170,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2c3e50',
   },
-  editButton: {
+  calculatorButton: {
     backgroundColor: 'white',
     marginHorizontal: 20,
     marginTop: 20,
+    padding: 18,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#28a745',
+  },
+  calculatorText: {
+    color: '#28a745',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  editButton: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    marginTop: 15,
     padding: 18,
     borderRadius: 12,
     flexDirection: 'row',
