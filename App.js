@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
@@ -11,8 +12,16 @@ const Stack = createNativeStackNavigator();
 function AppContent() {
   const { user, loading } = useAuth();
 
+  console.log('AppContent - user:', user);
+  console.log('AppContent - loading:', loading);
+
   if (loading) {
-    return null; // ekran ładowania 
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#28a745" />
+        <Text style={{ marginTop: 20 }}>Ładowanie...</Text>
+      </View>
+    );
   }
 
   return (
@@ -32,6 +41,8 @@ function AppContent() {
 }
 
 export default function App() {
+  console.log('App starting...');
+  
   return (
     <AuthProvider>
       <AppContent />
