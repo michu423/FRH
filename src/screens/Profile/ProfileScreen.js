@@ -22,7 +22,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!user?.uid) return;
 
-    // zmiany profilu na żywo
+    // Zmiany profilu na żywo
     const profileRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -40,26 +40,17 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  const handleLogout = async () => {
-    Alert.alert(
-      'Wylogowanie',
-      'Czy na pewno chcesz się wylogować?',
-      [
-        { text: 'Anuluj', style: 'cancel' },
-        { 
-          text: 'Wyloguj', 
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              Alert.alert('Błąd', 'Problem z wylogowaniem');
-            }
-          }
-        }
-      ]
-    );
-  };
+const handleLogout = async () => {
+  try {
+    await logout();
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  } catch (error) {
+    Alert.alert('Błąd', 'Nie udało się wylogować');
+  }
+};
 
   return (
     <ScrollView style={styles.container}>
