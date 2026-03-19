@@ -10,7 +10,6 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation();
   
-  // Stan lokalny dla profilu odświeża się automatycznie
   const [profileData, setProfileData] = useState({
     name: '',
     age: null,
@@ -22,17 +21,16 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!user?.uid) return;
 
-    // Zmiany profilu na żywo
     const profileRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setProfileData({
-          name: data.profile?.name || 'Użytkownik',
-          age: data.profile?.age || null,
-          weight: data.profile?.weight || null,
-          height: data.profile?.height || null,
-          activePlan: data.profile?.activePlan || null,
+          name: data.profile?.name || data.name || 'Użytkownik',
+          age: data.profile?.age || data.age || null,
+          weight: data.profile?.weight || data.weight || null,
+          height: data.profile?.height || data.height || null,
+          activePlan: data.profile?.activePlan || data.activePlan || null,
         });
       }
     });
@@ -40,30 +38,41 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-const handleLogout = async () => {
-  try {
-    await logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  } catch (error) {
-    Alert.alert('Błąd', 'Nie udało się wylogować');
-  }
-};
+  const handleLogout = async () => {
+    Alert.alert(
+      'Wylogowanie',
+      'Czy na pewno chcesz się wylogować?',
+      [
+        { text: 'Anuluj', style: 'cancel' },
+        { 
+          text: 'Wyloguj', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            } catch (error) {
+              Alert.alert('Błąd', 'Problem z wylogowaniem');
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header z ikoną użytkownika */}
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle" size={120} color="#28a745" />
         </View>
-        <Text style={styles.name}>{profileData.name}</Text>  {/* Z lokalnego stanu */}
+        <Text style={styles.name}>{profileData.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
       </View>
 
-      {/* Karta z danymi */}
       <View style={styles.infoCard}>
         <Text style={styles.cardTitle}>Twoje dane</Text>
         
@@ -72,7 +81,7 @@ const handleLogout = async () => {
             <Ionicons name="calendar-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wiek</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.age || '-'} lat</Text>  {/* Z lokalnego stanu */}
+          <Text style={styles.infoValue}>{profileData.age || '-'} lat</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -80,7 +89,7 @@ const handleLogout = async () => {
             <Ionicons name="scale-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Waga</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.weight || '-'} kg</Text>  {/* Z lokalnego stanu */}
+          <Text style={styles.infoValue}>{profileData.weight || '-'} kg</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -88,7 +97,7 @@ const handleLogout = async () => {
             <Ionicons name="resize-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wzrost</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.height || '-'} cm</Text>  {/* Z lokalnego stanu */}
+          <Text style={styles.infoValue}>{profileData.height || '-'} cm</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -96,11 +105,10 @@ const handleLogout = async () => {
             <Ionicons name="fitness-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Aktywny plan</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.activePlan || 'Brak'}</Text>  {/* Z lokalnego stanu */}
+          <Text style={styles.infoValue}>{profileData.activePlan || 'Brak'}</Text>
         </View>
       </View>
 
-      {/* Przyciski akcji */}
       <TouchableOpacity 
         style={styles.calculatorButton}
         onPress={() => navigation.navigate('CalorieCalculator')}
@@ -127,7 +135,6 @@ const handleLogout = async () => {
   );
 }
 
-// Style bez zmian (skopiuj z poprzedniej wersji)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
