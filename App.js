@@ -6,11 +6,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-// Ekrany autoryzacji
+// Auth screens
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 
-// Główne ekrany
+// Main screens
 import HomeScreen from './src/screens/Home/HomeScreen';
 import PlansScreen from './src/screens/Plans/PlansScreen';
 import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';
@@ -19,6 +19,7 @@ import ExerciseDetailScreen from './src/screens/Exercises/ExerciseDetailScreen';
 import ProgressScreen from './src/screens/Progress/ProgressScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
 import CalorieCalculatorScreen from './src/screens/Profile/CalorieCalculatorScreen';
+import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import WorkoutScreen from './src/screens/Workout/WorkoutScreen';
 import WorkoutCompleteScreen from './src/screens/Workout/WorkoutCompleteScreen';
 
@@ -45,12 +46,13 @@ function ExercisesStack() {
   );
 }
 
-// Profile (kalkulator kalorii)
+// Profile (kalkulator + edycja)
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ProfileMain" component={ProfileScreen} />
       <Stack.Screen name="CalorieCalculator" component={CalorieCalculatorScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>
   );
 }
@@ -136,6 +138,7 @@ function AppContent() {
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="Workout" component={WorkoutScreen} />
             <Stack.Screen name="WorkoutComplete" component={WorkoutCompleteScreen} />
+            {/* Profile screens już są w ProfileStack */}
           </>
         ) : (
           <>

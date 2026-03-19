@@ -1,12 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../../firebase.config.js';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation();
+  
+  // Stan lokalny dla profilu odświeża się automatycznie
+  const [profileData, setProfileData] = useState({
+    name: '',
+    age: null,
+    weight: null,
+    height: null,
+    activePlan: null,
+  });
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    // zmiany profilu na żywo
+    const profileRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(profileRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setProfileData({
+          name: data.profile?.name || 'Użytkownik',
+          age: data.profile?.age || null,
+          weight: data.profile?.weight || null,
+          height: data.profile?.height || null,
+          activePlan: data.profile?.activePlan || null,
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user?.uid]);
 
   const handleLogout = async () => {
     Alert.alert(
@@ -36,7 +68,7 @@ export default function ProfileScreen() {
         <View style={styles.avatarContainer}>
           <Ionicons name="person-circle" size={120} color="#28a745" />
         </View>
-        <Text style={styles.name}>{user?.profile?.name || 'Użytkownik'}</Text>
+        <Text style={styles.name}>{profileData.name}</Text>  {/* Z lokalnego stanu */}
         <Text style={styles.email}>{user?.email}</Text>
       </View>
 
@@ -49,7 +81,7 @@ export default function ProfileScreen() {
             <Ionicons name="calendar-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wiek</Text>
           </View>
-          <Text style={styles.infoValue}>{user?.profile?.age || '-'} lat</Text>
+          <Text style={styles.infoValue}>{profileData.age || '-'} lat</Text>  {/* Z lokalnego stanu */}
         </View>
 
         <View style={styles.infoRow}>
@@ -57,7 +89,7 @@ export default function ProfileScreen() {
             <Ionicons name="scale-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Waga</Text>
           </View>
-          <Text style={styles.infoValue}>{user?.profile?.weight || '-'} kg</Text>
+          <Text style={styles.infoValue}>{profileData.weight || '-'} kg</Text>  {/* Z lokalnego stanu */}
         </View>
 
         <View style={styles.infoRow}>
@@ -65,7 +97,7 @@ export default function ProfileScreen() {
             <Ionicons name="resize-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wzrost</Text>
           </View>
-          <Text style={styles.infoValue}>{user?.profile?.height || '-'} cm</Text>
+          <Text style={styles.infoValue}>{profileData.height || '-'} cm</Text>  {/* Z lokalnego stanu */}
         </View>
 
         <View style={styles.infoRow}>
@@ -73,11 +105,11 @@ export default function ProfileScreen() {
             <Ionicons name="fitness-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Aktywny plan</Text>
           </View>
-          <Text style={styles.infoValue}>{user?.profile?.activePlan || 'Brak'}</Text>
+          <Text style={styles.infoValue}>{profileData.activePlan || 'Brak'}</Text>  {/* Z lokalnego stanu */}
         </View>
       </View>
 
-      {/* Przycisk kalkulatora */}
+      {/* Przyciski akcji */}
       <TouchableOpacity 
         style={styles.calculatorButton}
         onPress={() => navigation.navigate('CalorieCalculator')}
@@ -86,24 +118,25 @@ export default function ProfileScreen() {
         <Text style={styles.calculatorText}>Kalkulator kalorii</Text>
       </TouchableOpacity>
 
-      {/* Przycisk edycji (placeholder) */}
-      <TouchableOpacity style={styles.editButton}>
+      <TouchableOpacity 
+        style={styles.editButton}
+        onPress={() => navigation.navigate('EditProfile')}
+      >
         <Ionicons name="create-outline" size={24} color="#007bff" />
         <Text style={styles.editText}>Edytuj profil</Text>
       </TouchableOpacity>
 
-      {/* Przycisk wylogowania */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={24} color="white" />
         <Text style={styles.logoutText}>Wyloguj się</Text>
       </TouchableOpacity>
 
-      {/* Dodatkowa przestrzeń na dole */}
       <View style={{ height: 50 }} />
     </ScrollView>
   );
 }
 
+// Style bez zmian (skopiuj z poprzedniej wersji)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
