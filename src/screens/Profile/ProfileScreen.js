@@ -9,7 +9,7 @@ import { db } from '../../../firebase.config.js';
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation();
-  
+
   const [profileData, setProfileData] = useState({
     name: '',
     age: null,
@@ -38,27 +38,25 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
+  // naprawA o wywołanie logout()
   const handleLogout = async () => {
     Alert.alert(
       'Wylogowanie',
       'Czy na pewno chcesz się wylogować?',
       [
         { text: 'Anuluj', style: 'cancel' },
-        { 
-          text: 'Wyloguj', 
+        {
+          text: 'Wyloguj',
           style: 'destructive',
           onPress: async () => {
             try {
               await logout();
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-              });
+              // Automatycznie przeniesie użytkownika na ekran logowania.
             } catch (error) {
-              Alert.alert('Błąd', 'Problem z wylogowaniem');
+              Alert.alert('Błąd', 'Problem z wylogowaniem. Spróbuj ponownie.');
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -75,7 +73,7 @@ export default function ProfileScreen() {
 
       <View style={styles.infoCard}>
         <Text style={styles.cardTitle}>Twoje dane</Text>
-        
+
         <View style={styles.infoRow}>
           <View style={styles.infoLeft}>
             <Ionicons name="calendar-outline" size={20} color="#7f8c8d" />
@@ -109,7 +107,7 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.calculatorButton}
         onPress={() => navigation.navigate('CalorieCalculator')}
       >
@@ -117,7 +115,7 @@ export default function ProfileScreen() {
         <Text style={styles.calculatorText}>Kalkulator kalorii</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.editButton}
         onPress={() => navigation.navigate('EditProfile')}
       >

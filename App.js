@@ -22,11 +22,12 @@ import CalorieCalculatorScreen from './src/screens/Profile/CalorieCalculatorScre
 import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import WorkoutScreen from './src/screens/Workout/WorkoutScreen';
 import WorkoutCompleteScreen from './src/screens/Workout/WorkoutCompleteScreen';
+// NOWE: Ekran osiągnięć
+import AchievementsScreen from './src/screens/Achievements/AchievementsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Plans
 function PlansStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -36,7 +37,6 @@ function PlansStack() {
   );
 }
 
-// Exercises
 function ExercisesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -46,7 +46,6 @@ function ExercisesStack() {
   );
 }
 
-// Profile (kalkulator + edycja)
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -57,14 +56,14 @@ function ProfileStack() {
   );
 }
 
-// Główna nawigacja
+// Główna nawigacja - dodano zakładkę Osiągnięcia
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          
+
           if (route.name === 'HomeTab') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'PlansTab') {
@@ -73,10 +72,12 @@ function MainTabs() {
             iconName = focused ? 'barbell' : 'barbell-outline';
           } else if (route.name === 'ProgressTab') {
             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
+          } else if (route.name === 'AchievementsTab') {
+            iconName = focused ? 'trophy' : 'trophy-outline';
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? 'person' : 'person-outline';
           }
-          
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#28a745',
@@ -84,28 +85,34 @@ function MainTabs() {
         headerShown: false,
       })}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeScreen} 
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
         options={{ tabBarLabel: 'Główna' }}
       />
-      <Tab.Screen 
-        name="PlansTab" 
+      <Tab.Screen
+        name="PlansTab"
         component={PlansStack}
         options={{ tabBarLabel: 'Plany' }}
       />
-      <Tab.Screen 
-        name="ExercisesTab" 
+      <Tab.Screen
+        name="ExercisesTab"
         component={ExercisesStack}
         options={{ tabBarLabel: 'Ćwiczenia' }}
       />
-      <Tab.Screen 
-        name="ProgressTab" 
-        component={ProgressScreen} 
+      <Tab.Screen
+        name="ProgressTab"
+        component={ProgressScreen}
         options={{ tabBarLabel: 'Postępy' }}
       />
-      <Tab.Screen 
-        name="ProfileTab" 
+      {/* NOWE: zakładka osiągnięć */}
+      <Tab.Screen
+        name="AchievementsTab"
+        component={AchievementsScreen}
+        options={{ tabBarLabel: 'Odznaki' }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
         component={ProfileStack}
         options={{ tabBarLabel: 'Profil' }}
       />
@@ -113,18 +120,12 @@ function MainTabs() {
   );
 }
 
-// Logika zalogowany/niezalogowany
 function AppContent() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: '#f8f9fa' 
-      }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
         <ActivityIndicator size="large" color="#28a745" />
       </View>
     );
@@ -138,7 +139,6 @@ function AppContent() {
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="Workout" component={WorkoutScreen} />
             <Stack.Screen name="WorkoutComplete" component={WorkoutCompleteScreen} />
-            {/* Profile screens już są w ProfileStack */}
           </>
         ) : (
           <>
@@ -151,7 +151,6 @@ function AppContent() {
   );
 }
 
-// Root
 export default function App() {
   return (
     <AuthProvider>
