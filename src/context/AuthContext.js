@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase.config.js';
 
@@ -15,10 +20,10 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        setUser({ 
+        setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
-          profile: userDoc.data() || {} 
+          profile: userDoc.data() || {},
         });
       } else {
         setUser(null);
@@ -39,17 +44,19 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, profileData) => {
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'users', res.user.uid), { 
-        ...profileData, 
+      await setDoc(doc(db, 'users', res.user.uid), {
+        ...profileData,
         activePlan: null,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
     } catch (error) {
       throw new Error('Błąd rejestracji');
     }
   };
 
+  // NAPRAWA WYLOGOWANIA NA EXPO WEB:
   const logout = async () => {
+    setUser(null);
     await signOut(auth);
   };
 
