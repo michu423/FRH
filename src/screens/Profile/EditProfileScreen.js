@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase.config.js';
+
+const showAlert = (title, message, onOk) => {
+  if (Platform.OS === 'web') {
+    window.alert(title + '\n' + message);
+    if (onOk) onOk();
+  } else {
+    Alert.alert(title, message, onOk ? [{ text: 'OK', onPress: onOk }] : undefined);
+  }
+};
 
 export default function EditProfileScreen() {
   const navigation = useNavigation();
@@ -27,24 +36,25 @@ export default function EditProfileScreen() {
 
   const saveProfile = async () => {
     if (!name.trim()) {
-      Alert.alert('Błąd', 'Podaj imię');
+      showAlert('Błąd', 'Podaj imię');
       return;
     }
     if (!age || parseInt(age) < 10 || parseInt(age) > 120) {
-      Alert.alert('Błąd', 'Podaj poprawny wiek (10-120 lat)');
+      showAlert('Błąd', 'Podaj poprawny wiek (10-120 lat)');
       return;
     }
     if (!weight || parseFloat(weight) < 30 || parseFloat(weight) > 300) {
-      Alert.alert('Błąd', 'Podaj poprawną wagę (30-300 kg)');
+      showAlert('Błąd', 'Podaj poprawną wagę (30-300 kg)');
       return;
     }
     if (!height || parseInt(height) < 100 || parseInt(height) > 250) {
-      Alert.alert('Błąd', 'Podaj poprawny wzrost (100-250 cm)');
+      showAlert('Błąd', 'Podaj poprawny wzrost (100-250 cm)');
       return;
     }
 
     setLoading(true);
     try {
+      // Zapis na płaskim poziomie — zgodnie z RegisterScreen
       await updateDoc(doc(db, 'users', user.uid), {
         name: name.trim(),
         age: parseInt(age),
@@ -53,13 +63,11 @@ export default function EditProfileScreen() {
         updatedAt: new Date().toISOString(),
       });
 
-      Alert.alert(
-        'Sukces!', 
-        'Profil został zaktualizowany',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
+      showAlert('Sukces!', 'Profil został zaktualizowany', () => {
+        navigation.goBack();
+      });
     } catch (error) {
-      Alert.alert('Błąd', 'Nie udało się zapisać profilu');
+      showAlert('Błąd', 'Nie udało się zapisać profilu');
       console.error('Błąd zapisu profilu:', error);
     } finally {
       setLoading(false);
@@ -68,7 +76,6 @@ export default function EditProfileScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={28} color="white" />
@@ -76,7 +83,6 @@ export default function EditProfileScreen() {
         <Text style={styles.title}>Edytuj profil</Text>
       </View>
 
-      {/* Avatar + Imię */}
       <View style={styles.avatarSection}>
         <View style={styles.avatar}>
           <Ionicons name="person-circle" size={100} color="#28a745" />
@@ -89,7 +95,6 @@ export default function EditProfileScreen() {
         />
       </View>
 
-      {/* Dane */}
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>Dane fizyczne</Text>
         
@@ -121,7 +126,6 @@ export default function EditProfileScreen() {
         </View>
       </View>
 
-      {/* Przycisk zapisz */}
       <TouchableOpacity 
         style={[styles.saveButton, loading && styles.saveButtonDisabled]} 
         onPress={saveProfile}

@@ -19,21 +19,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        const data = userDoc.data() || {};
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          profile: {
-            name: data.name || '',
-            age: data.age || null,
-            weight: data.weight || null,
-            height: data.height || null,
-            gender: data.gender || 'male',
-            activePlan: data.activePlan || null,
-            activePlanName: data.activePlanName || null,
-          },
-        });
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const data = userDoc.data() || {};
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            profile: {
+              name: data.name || '',
+              age: data.age || null,
+              weight: data.weight || null,
+              height: data.height || null,
+              gender: data.gender || 'male',
+              activePlan: data.activePlan || null,
+              activePlanName: data.activePlanName || null,
+            },
+          });
+        } catch (error) {
+          console.error('Błąd odczytu profilu:', error);
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            profile: {},
+          });
+        }
       } else {
         setUser(null);
       }
@@ -65,8 +74,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    setUser(null);
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      setUser(null);
+      throw error;
+    }
   };
 
   return (

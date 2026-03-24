@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+
+// Funkcja pomocnicza (alert działający na web i mobilkach
+const showAlert = (title, message) => {
+  if (Platform.OS === 'web') {
+    window.alert(title + '\n' + message);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState('');
@@ -15,19 +24,18 @@ export default function RegisterScreen() {
   const navigation = useNavigation();
 
   const handleRegister = async () => {
-    // Walidacja
     if (!email || !password || !name || !age || !weight || !height) {
-      Alert.alert('Błąd', 'Wypełnij wszystkie pola');
+      showAlert('Błąd', 'Wypełnij wszystkie pola');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Błąd', 'Hasło musi mieć minimum 6 znaków');
+      showAlert('Błąd', 'Hasło musi mieć minimum 6 znaków');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Błąd', 'Hasła nie są identyczne');
+      showAlert('Błąd', 'Hasła nie są identyczne');
       return;
     }
 
@@ -37,13 +45,13 @@ export default function RegisterScreen() {
         age: parseInt(age),
         weight: parseFloat(weight),
         height: parseFloat(height),
-        gender: 'male', // Domyślnie
+        gender: 'male',
       };
 
       await register(email, password, profileData);
-      Alert.alert('Sukces', 'Konto zostało utworzone! Możesz się zalogować.');
+      showAlert('Sukces', 'Konto zostało utworzone! Możesz się zalogować.');
     } catch (error) {
-      Alert.alert('Błąd', 'Problem z rejestracją. Email może być już zajęty.');
+      showAlert('Błąd', 'Problem z rejestracją. Email może być już zajęty.');
     }
   };
 

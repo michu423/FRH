@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+
+const showAlert = (title, message) => {
+  if (Platform.OS === 'web') {
+    window.alert(title + '\n' + message);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -11,13 +19,13 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Błąd', 'Wypełnij wszystkie pola');
+      showAlert('Błąd', 'Wypełnij wszystkie pola');
       return;
     }
     try {
       await login(email, password);
     } catch (error) {
-      Alert.alert('Błąd', 'Nieprawidłowy email lub hasło');
+      showAlert('Błąd', 'Nieprawidłowy email lub hasło');
     }
   };
 

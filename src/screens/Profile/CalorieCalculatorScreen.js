@@ -1,13 +1,19 @@
-// src/screens/Profile/CalorieCalculatorScreen.js - PEŁNY (z formularzem)
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+
+const showAlert = (title, message) => {
+  if (Platform.OS === 'web') {
+    window.alert(title + '\n' + message);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function CalorieCalculatorScreen() {
   const navigation = useNavigation();
   
-  // Dane z formularza
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -17,9 +23,8 @@ export default function CalorieCalculatorScreen() {
   const [calories, setCalories] = useState(null);
 
   const calculateCalories = () => {
-    // Walidacja
     if (!age || !weight || !height) {
-      alert('Wypełnij wszystkie pola!');
+      showAlert('Błąd', 'Wypełnij wszystkie pola!');
       return;
     }
 
@@ -28,11 +33,11 @@ export default function CalorieCalculatorScreen() {
     const heightNum = parseFloat(height);
 
     if (ageNum < 10 || ageNum > 120 || weightNum < 30 || weightNum > 300 || heightNum < 100 || heightNum > 250) {
-      alert('Podaj prawidłowe wartości');
+      showAlert('Błąd', 'Podaj prawidłowe wartości');
       return;
     }
 
-    // BMR (podstawowa przemiana materii)
+    // Wzór Mifflina-St Jeora
     let bmr;
     if (gender === 'male') {
       bmr = 10 * weightNum + 6.25 * heightNum - 5 * ageNum + 5;
@@ -40,8 +45,8 @@ export default function CalorieCalculatorScreen() {
       bmr = 10 * weightNum + 6.25 * heightNum - 5 * ageNum - 161;
     }
 
-    // Poziom aktywności
-    let multiplier = 1.55; // moderate
+    // (PAL)
+    let multiplier = 1.55;
     if (activity === 'low') multiplier = 1.3;
     if (activity === 'high') multiplier = 1.7;
 
@@ -57,7 +62,6 @@ export default function CalorieCalculatorScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="white" />
@@ -66,9 +70,8 @@ export default function CalorieCalculatorScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Formularz danych */}
         <View style={styles.section}>
-          <Text style={styles.label}>📊 Twoje dane</Text>
+          <Text style={styles.label}>Twoje dane</Text>
           
           <Text style={styles.inputLabel}>Wiek (lata)</Text>
           <TextInput
@@ -129,9 +132,8 @@ export default function CalorieCalculatorScreen() {
           </View>
         </View>
 
-        {/* Poziom aktywności */}
         <View style={styles.section}>
-          <Text style={styles.label}>🏃 Poziom aktywności</Text>
+          <Text style={styles.label}>Poziom aktywności</Text>
           
           <TouchableOpacity
             style={[styles.option, activity === 'low' && styles.optionActive]}
@@ -155,47 +157,44 @@ export default function CalorieCalculatorScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Cel */}
         <View style={styles.section}>
-          <Text style={styles.label}>🎯 Twój cel</Text>
+          <Text style={styles.label}>Twój cel</Text>
           
           <TouchableOpacity
             style={[styles.option, goal === 'lose' && styles.optionActive]}
             onPress={() => setGoal('lose')}
           >
-            <Text style={styles.optionText}>📉 Schudnąć</Text>
+            <Text style={styles.optionText}>Schudnąć</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.option, goal === 'maintain' && styles.optionActive]}
             onPress={() => setGoal('maintain')}
           >
-            <Text style={styles.optionText}>⚖️ Utrzymać wagę</Text>
+            <Text style={styles.optionText}>Utrzymać wagę</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.option, goal === 'gain' && styles.optionActive]}
             onPress={() => setGoal('gain')}
           >
-            <Text style={styles.optionText}>📈 Nabrać masy</Text>
+            <Text style={styles.optionText}>Nabrać masy</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Przycisk Oblicz */}
         <TouchableOpacity style={styles.button} onPress={calculateCalories}>
           <Ionicons name="calculator" size={24} color="white" />
           <Text style={styles.buttonText}>Oblicz zapotrzebowanie</Text>
         </TouchableOpacity>
 
-        {/* Wynik */}
         {calories && (
           <View style={styles.result}>
             <Text style={styles.resultTitle}>Twoje dzienne zapotrzebowanie:</Text>
             <Text style={styles.resultValue}>{calories} kcal</Text>
             <Text style={styles.resultHint}>
-              {goal === 'lose' && '💡 Jedz mniej niż ta wartość, aby schudnąć'}
-              {goal === 'maintain' && '💡 Jedz tyle, aby utrzymać wagę'}
-              {goal === 'gain' && '💡 Jedz więcej niż ta wartość, aby przytyć'}
+              {goal === 'lose' && 'Jedz mniej niż ta wartość, aby schudnąć'}
+              {goal === 'maintain' && 'Jedz tyle, aby utrzymać wagę'}
+              {goal === 'gain' && 'Jedz więcej niż ta wartość, aby przytyć'}
             </Text>
           </View>
         )}

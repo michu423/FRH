@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -38,25 +38,37 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
+  // Na web używamy window.confirm. Na urządzeniach mobilnych Alert.alert
   const handleLogout = async () => {
-    Alert.alert(
-      'Wylogowanie',
-      'Czy na pewno chcesz się wylogować?',
-      [
-        { text: 'Anuluj', style: 'cancel' },
-        {
-          text: 'Wyloguj',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              Alert.alert('Błąd', 'Problem z wylogowaniem. Spróbuj ponownie.');
-            }
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Czy na pewno chcesz się wylogować?');
+      if (confirmed) {
+        try {
+          await logout();
+        } catch (error) {
+          window.alert('Problem z wylogowaniem. Spróbuj ponownie.');
+        }
+      }
+    } else {
+      Alert.alert(
+        'Wylogowanie',
+        'Czy na pewno chcesz się wylogować?',
+        [
+          { text: 'Anuluj', style: 'cancel' },
+          {
+            text: 'Wyloguj',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await logout();
+              } catch (error) {
+                Alert.alert('Błąd', 'Problem z wylogowaniem. Spróbuj ponownie.');
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   return (
@@ -77,7 +89,7 @@ export default function ProfileScreen() {
             <Ionicons name="calendar-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wiek</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.age ? `${profileData.age} lat` : '-'}</Text>
+          <Text style={styles.infoValue}>{profileData.age ? profileData.age + ' lat' : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -85,7 +97,7 @@ export default function ProfileScreen() {
             <Ionicons name="scale-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Waga</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.weight ? `${profileData.weight} kg` : '-'}</Text>
+          <Text style={styles.infoValue}>{profileData.weight ? profileData.weight + ' kg' : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -93,7 +105,7 @@ export default function ProfileScreen() {
             <Ionicons name="resize-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wzrost</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.height ? `${profileData.height} cm` : '-'}</Text>
+          <Text style={styles.infoValue}>{profileData.height ? profileData.height + ' cm' : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>

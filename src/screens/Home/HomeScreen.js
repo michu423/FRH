@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -32,17 +32,25 @@ export default function HomeScreen() {
     if (activePlan) {
       navigation.navigate('Workout', {
         planId: activePlan.id,
-        dayIndex: 0, // Zawsze pierwszy dzień
+        dayIndex: 0,
       });
     } else {
-      Alert.alert(
-        'Brak planu', 
-        'Wybierz najpierw plan treningowy',
-        [
-          { text: 'Anuluj', style: 'cancel' },
-          { text: 'Wybierz plan', onPress: () => navigation.navigate('PlansTab') }
-        ]
-      );
+      // Alert z przyciskiem nawigacji — na web uproszczony
+      if (Platform.OS === 'web') {
+        const goToPlans = window.confirm('Brak planu\nWybierz najpierw plan treningowy.\n\nKliknij OK aby przejść do planów.');
+        if (goToPlans) {
+          navigation.navigate('PlansTab');
+        }
+      } else {
+        Alert.alert(
+          'Brak planu', 
+          'Wybierz najpierw plan treningowy',
+          [
+            { text: 'Anuluj', style: 'cancel' },
+            { text: 'Wybierz plan', onPress: () => navigation.navigate('PlansTab') }
+          ]
+        );
+      }
     }
   };
 
@@ -91,16 +99,13 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>Witaj, {user?.profile?.name || 'Użytkowniku'}! 👋</Text>
+        <Text style={styles.greeting}>Witaj, {user?.profile?.name || 'Użytkowniku'}!</Text>
         <Text style={styles.subtitle}>Co chcesz dzisiaj zrobić?</Text>
       </View>
 
-      {/* DODATKOWA PRZESTRZEŃ - karty niżej! */}
       <View style={styles.spacer} />
 
-      {/* Menu Cards */}
       <View style={styles.menuGrid}>
         {menuItems.map((item) => (
           <TouchableOpacity
@@ -138,7 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#28a745',
     padding: 30,
     paddingTop: 60,
-    paddingBottom: 20,  // ZMNIEJSZONE z 40 na 20
+    paddingBottom: 20,
   },
   greeting: {
     fontSize: 28,
@@ -150,14 +155,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#e0e0e0',
   },
-  // NOWY SPACER - odsuwający karty od zielonej linii!
   spacer: {
-    height: 40,  // 40px odstępu między headerem a kartami
-    backgroundColor: '#f8f9fa',  // ten sam kolor co tło
+    height: 40,
+    backgroundColor: '#f8f9fa',
   },
   menuGrid: {
     paddingHorizontal: 20,
-    paddingTop: 10,  // Lekko odsunięte od spacji
+    paddingTop: 10,
   },
   menuCard: {
     backgroundColor: 'white',
