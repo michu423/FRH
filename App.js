@@ -6,11 +6,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-// Auth screens
+// Ekrany autoryzacji
 import LoginScreen from './src/screens/Auth/LoginScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
 
-// Main screens
+// Ekrany główne
 import HomeScreen from './src/screens/Home/HomeScreen';
 import PlansScreen from './src/screens/Plans/PlansScreen';
 import PlanDetailScreen from './src/screens/Plans/PlanDetailScreen';
@@ -22,7 +22,6 @@ import CalorieCalculatorScreen from './src/screens/Profile/CalorieCalculatorScre
 import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import WorkoutScreen from './src/screens/Workout/WorkoutScreen';
 import WorkoutCompleteScreen from './src/screens/Workout/WorkoutCompleteScreen';
-// NOWE: Ekran osiągnięć
 import AchievementsScreen from './src/screens/Achievements/AchievementsScreen';
 
 const Stack = createNativeStackNavigator();
@@ -56,14 +55,13 @@ function ProfileStack() {
   );
 }
 
-// Główna nawigacja - dodano zakładkę Osiągnięcia
+// Główna nawigacja
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === 'HomeTab') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'PlansTab') {
@@ -77,7 +75,6 @@ function MainTabs() {
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? 'person' : 'person-outline';
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#28a745',
@@ -105,7 +102,6 @@ function MainTabs() {
         component={ProgressScreen}
         options={{ tabBarLabel: 'Postępy' }}
       />
-      {/* NOWE: zakładka osiągnięć */}
       <Tab.Screen
         name="AchievementsTab"
         component={AchievementsScreen}

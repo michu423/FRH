@@ -18,7 +18,6 @@ export default function ExercisesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Baza ćwiczeń</Text>
         <Text style={styles.subtitle}>{exercises.length} ćwiczeń</Text>
@@ -40,7 +39,7 @@ export default function ExercisesScreen() {
         )}
       </View>
 
-      {/* Category filters */}
+      {/* Filtry */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
         {categories.map(cat => (
           <TouchableOpacity
