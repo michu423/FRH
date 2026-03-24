@@ -20,10 +20,19 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        const data = userDoc.data() || {};
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
-          profile: userDoc.data() || {},
+          profile: {
+            name: data.name || '',
+            age: data.age || null,
+            weight: data.weight || null,
+            height: data.height || null,
+            gender: data.gender || 'male',
+            activePlan: data.activePlan || null,
+            activePlanName: data.activePlanName || null,
+          },
         });
       } else {
         setUser(null);
@@ -47,6 +56,7 @@ export const AuthProvider = ({ children }) => {
       await setDoc(doc(db, 'users', res.user.uid), {
         ...profileData,
         activePlan: null,
+        activePlanName: null,
         createdAt: new Date().toISOString(),
       });
     } catch (error) {
@@ -54,7 +64,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // NAPRAWA WYLOGOWANIA NA EXPO WEB:
   const logout = async () => {
     setUser(null);
     await signOut(auth);

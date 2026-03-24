@@ -15,7 +15,7 @@ export default function ProfileScreen() {
     age: null,
     weight: null,
     height: null,
-    activePlan: null,
+    activePlanName: null,
   });
 
   useEffect(() => {
@@ -26,11 +26,11 @@ export default function ProfileScreen() {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setProfileData({
-          name: data.profile?.name || data.name || 'Użytkownik',
-          age: data.profile?.age || data.age || null,
-          weight: data.profile?.weight || data.weight || null,
-          height: data.profile?.height || data.height || null,
-          activePlan: data.profile?.activePlan || data.activePlan || null,
+          name: data.name || 'Użytkownik',
+          age: data.age || null,
+          weight: data.weight || null,
+          height: data.height || null,
+          activePlanName: data.activePlanName || null,
         });
       }
     });
@@ -38,7 +38,6 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  // naprawA o wywołanie logout()
   const handleLogout = async () => {
     Alert.alert(
       'Wylogowanie',
@@ -51,7 +50,6 @@ export default function ProfileScreen() {
           onPress: async () => {
             try {
               await logout();
-              // Automatycznie przeniesie użytkownika na ekran logowania.
             } catch (error) {
               Alert.alert('Błąd', 'Problem z wylogowaniem. Spróbuj ponownie.');
             }
@@ -79,7 +77,7 @@ export default function ProfileScreen() {
             <Ionicons name="calendar-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wiek</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.age || '-'} lat</Text>
+          <Text style={styles.infoValue}>{profileData.age ? `${profileData.age} lat` : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -87,7 +85,7 @@ export default function ProfileScreen() {
             <Ionicons name="scale-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Waga</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.weight || '-'} kg</Text>
+          <Text style={styles.infoValue}>{profileData.weight ? `${profileData.weight} kg` : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -95,7 +93,7 @@ export default function ProfileScreen() {
             <Ionicons name="resize-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Wzrost</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.height || '-'} cm</Text>
+          <Text style={styles.infoValue}>{profileData.height ? `${profileData.height} cm` : '-'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -103,7 +101,7 @@ export default function ProfileScreen() {
             <Ionicons name="fitness-outline" size={20} color="#7f8c8d" />
             <Text style={styles.infoLabel}>Aktywny plan</Text>
           </View>
-          <Text style={styles.infoValue}>{profileData.activePlan || 'Brak'}</Text>
+          <Text style={styles.infoValue}>{profileData.activePlanName || 'Brak'}</Text>
         </View>
       </View>
 

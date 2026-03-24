@@ -10,7 +10,6 @@ export default function EditProfileScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
   
-  // Domyślne wartości z profilu
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
@@ -18,7 +17,6 @@ export default function EditProfileScreen() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Wczytaj aktualne dane z profilu
     if (user?.profile) {
       setName(user.profile.name || '');
       setAge(user.profile.age?.toString() || '');
@@ -28,37 +26,35 @@ export default function EditProfileScreen() {
   }, [user]);
 
   const saveProfile = async () => {
-    // Walidacja
     if (!name.trim()) {
       Alert.alert('Błąd', 'Podaj imię');
       return;
     }
-    if (!age || age < 10 || age > 120) {
+    if (!age || parseInt(age) < 10 || parseInt(age) > 120) {
       Alert.alert('Błąd', 'Podaj poprawny wiek (10-120 lat)');
       return;
     }
-    if (!weight || weight < 30 || weight > 300) {
+    if (!weight || parseFloat(weight) < 30 || parseFloat(weight) > 300) {
       Alert.alert('Błąd', 'Podaj poprawną wagę (30-300 kg)');
       return;
     }
-    if (!height || height < 100 || height > 250) {
+    if (!height || parseInt(height) < 100 || parseInt(height) > 250) {
       Alert.alert('Błąd', 'Podaj poprawny wzrost (100-250 cm)');
       return;
     }
 
     setLoading(true);
     try {
-      // Aktualizuj Firestore
       await updateDoc(doc(db, 'users', user.uid), {
-        'profile.name': name.trim(),
-        'profile.age': parseInt(age),
-        'profile.weight': parseFloat(weight),
-        'profile.height': parseInt(height),
-        updatedAt: new Date(),
+        name: name.trim(),
+        age: parseInt(age),
+        weight: parseFloat(weight),
+        height: parseInt(height),
+        updatedAt: new Date().toISOString(),
       });
 
       Alert.alert(
-        'Sukces! ✅', 
+        'Sukces!', 
         'Profil został zaktualizowany',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
@@ -90,11 +86,10 @@ export default function EditProfileScreen() {
           placeholder="Imię i nazwisko"
           value={name}
           onChangeText={setName}
-          autoFocus
         />
       </View>
 
-      {/* Dane antropometryczne */}
+      {/* Dane */}
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>Dane fizyczne</Text>
         
@@ -132,16 +127,10 @@ export default function EditProfileScreen() {
         onPress={saveProfile}
         disabled={loading}
       >
-        {loading ? (
-          <View style={styles.loadingSpinner}>
-            <Ionicons name="ellipse-horizontal" size={24} color="white" />
-          </View>
-        ) : (
-          <>
-            <Ionicons name="checkmark-circle" size={24} color="white" />
-            <Text style={styles.saveButtonText}>Zapisz zmiany</Text>
-          </>
-        )}
+        <Ionicons name="checkmark-circle" size={24} color="white" />
+        <Text style={styles.saveButtonText}>
+          {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
+        </Text>
       </TouchableOpacity>
 
       <View style={{ height: 50 }} />
@@ -244,11 +233,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  loadingSpinner: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
